@@ -2,6 +2,7 @@ import os
 import asyncio
 from dotenv import load_dotenv
 from telethon import TelegramClient, events
+from telethon.sessions import StringSession
 
 load_dotenv()
 
@@ -23,7 +24,14 @@ if not TARGET_GROUP_ID:
 if not CHANNEL_USERNAMES:
     raise RuntimeError("CHANNEL_USERNAMES vazio no .env")
 
-client = TelegramClient("promo_forwarder_session", API_ID, API_HASH)
+
+SESSION_STRING = os.getenv("SESSION_STRING")
+
+if SESSION_STRING:
+    client = TelegramClient(StringSession(SESSION_STRING), API_ID, API_HASH)
+else:
+    # fallback para uso local com arquivo .session
+    client = TelegramClient("promo_forwarder_session", API_ID, API_HASH)
 
 
 @client.on(events.NewMessage(chats=CHANNEL_USERNAMES))
